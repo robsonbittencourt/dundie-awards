@@ -25,6 +25,7 @@
         <table class="table table-striped">
             <thead class="thead-dark">
             <tr>
+                <th>Employee id</th>
                 <th>First name</th>
                 <th>Last name</th>
                 <th>Dundie Awards</th>
@@ -34,6 +35,7 @@
             </thead>
             <tbody>
             <tr th:each="employee : ${employees}">
+                <td th:text="${employee.id}"></td>
                 <td th:text="${employee.firstName}"></td>
                 <td th:text="${employee.lastName}"></td>
                 <td th:text="${employee.dundieAwards}"></td>
