@@ -17,11 +17,14 @@ public class ActivityEventListener implements ApplicationListener<EmployeeEvent>
     @Autowired
     private MessageBroker messageBroker;
 
+    @Autowired
+    private ActivityProducer activityProducer;
+
     @Override
     public void onApplicationEvent(EmployeeEvent event) {
         Activity activity = new Activity(event.getOccuredAt(), event.getEvent());
         activityRepository.save(activity);
 
-        messageBroker.sendMessage(activity);
+        activityProducer.send(activity);
     }
 }
