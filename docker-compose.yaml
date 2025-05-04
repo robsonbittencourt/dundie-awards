@@ -1,4 +1,17 @@
 services:
+  postgres:
+    image: postgres:16
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -11,5 +24,7 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
+
 volumes:
   rabbitmq_data:
+  postgres_data:
