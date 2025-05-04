@@ -1,4 +1,9 @@
 package com.ninjaone.dundie_awards.application.api.employee;
 
-record UpdateEmployeeRequest(String firstName, String lastName) {
+import jakarta.validation.constraints.NotBlank;
+
+record UpdateEmployeeRequest(
+    @NotBlank(message = "First name is required") String firstName,
+    @NotBlank(message = "First name is required") String lastName
+) {
 }

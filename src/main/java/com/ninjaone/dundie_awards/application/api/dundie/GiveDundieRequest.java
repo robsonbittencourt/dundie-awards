@@ -1,4 +1,6 @@
 package com.ninjaone.dundie_awards.application.api.dundie;
 
-record GiveDundieRequest(Long employeeId) {
+import jakarta.validation.constraints.NotNull;
+
+record GiveDundieRequest(@NotNull(message = "Employee ID required") Long employeeId) {
 }

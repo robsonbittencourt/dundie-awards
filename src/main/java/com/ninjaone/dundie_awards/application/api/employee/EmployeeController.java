@@ -2,6 +2,7 @@ package com.ninjaone.dundie_awards.application.api.employee;
 
 import com.ninjaone.dundie_awards.infrastructure.repository.employee.Employee;
 import com.ninjaone.dundie_awards.infrastructure.repository.employee.EmployeeRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class EmployeeController {
     }
 
     @PostMapping()
-    EmployeeResponse createEmployee(@RequestBody CreateEmployeeRequest request) {
+    EmployeeResponse createEmployee(@Valid @RequestBody CreateEmployeeRequest request) {
         Employee employee = employeeRepository.create(request.firstName(), request.lastName(), request.organizationId());
         return new EmployeeResponse(employee);
     }
@@ -39,7 +40,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable Long id, @RequestBody UpdateEmployeeRequest request) {
+    ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable Long id, @Valid @RequestBody UpdateEmployeeRequest request) {
         return employeeRepository.updateName(id, request.firstName(), request.lastName())
             .map(employee -> ok(new EmployeeResponse(employee)))
             .orElse(notFound().build());

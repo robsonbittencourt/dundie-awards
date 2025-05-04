@@ -1,6 +1,7 @@
 package com.ninjaone.dundie_awards.application.api.dundie;
 
 import com.ninjaone.dundie_awards.infrastructure.repository.employee.EmployeeRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +18,7 @@ class DundieController {
     private EmployeeRepository employeeRepository;
 
     @PostMapping("/dundie")
-    ResponseEntity<Void> giveDundie(@RequestBody GiveDundieRequest request) {
+    ResponseEntity<Void> giveDundie(@Valid @RequestBody GiveDundieRequest request) {
         boolean dundieWasDelivered = employeeRepository.giveDundie(request.employeeId());
 
         if (!dundieWasDelivered) {
