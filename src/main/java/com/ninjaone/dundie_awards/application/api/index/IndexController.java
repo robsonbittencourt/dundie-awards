@@ -1,9 +1,9 @@
-package com.ninjaone.dundie_awards.controller;
+package com.ninjaone.dundie_awards.application.api.index;
 
-import com.ninjaone.dundie_awards.AwardsCache;
-import com.ninjaone.dundie_awards.MessageBroker;
-import com.ninjaone.dundie_awards.repository.ActivityRepository;
-import com.ninjaone.dundie_awards.repository.EmployeeRepository;
+import com.ninjaone.dundie_awards.infrastructure.MessageBroker;
+import com.ninjaone.dundie_awards.infrastructure.repository.activity.ActivityRepository;
+import com.ninjaone.dundie_awards.infrastructure.repository.employee.AwardsCache;
+import com.ninjaone.dundie_awards.infrastructure.repository.employee.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
