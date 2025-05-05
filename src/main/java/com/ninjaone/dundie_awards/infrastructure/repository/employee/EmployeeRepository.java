@@ -1,5 +1,6 @@
 package com.ninjaone.dundie_awards.infrastructure.repository.employee;
 
+import com.ninjaone.dundie_awards.infrastructure.cache.AwardsRedisCache;
 import com.ninjaone.dundie_awards.infrastructure.repository.organization.Organization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,6 +18,9 @@ public class EmployeeRepository {
 
     @Autowired
     private AwardsCache cache;
+
+    @Autowired
+    private AwardsRedisCache awardsRedisCache;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -70,8 +74,8 @@ public class EmployeeRepository {
         employeeRepository.deleteById(id);
 
         int actualEmployeeDundies = employee.getDundieAwards() != null ? employee.getDundieAwards() : 0;
-        int totalAwards = cache.getTotalAwards() - actualEmployeeDundies;
-        cache.setTotalAwards(totalAwards);
+        int totalAwards = awardsRedisCache.getCounter().intValue() - actualEmployeeDundies;
+        awardsRedisCache.updateCounter(totalAwards);
 
         eventPublisher.publishEvent(new EmployeeEvent(this, "employee_deleted"));
 
@@ -84,7 +88,7 @@ public class EmployeeRepository {
         boolean dundieWasDelivered = givenDundies > 0;
 
         if (dundieWasDelivered) {
-            cache.addOneAward();
+            awardsRedisCache.increment();
             eventPublisher.publishEvent(new EmployeeEvent(this, "dundie_delivered"));
         }
 
