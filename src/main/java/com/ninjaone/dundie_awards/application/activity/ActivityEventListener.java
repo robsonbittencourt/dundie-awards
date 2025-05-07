@@ -1,6 +1,5 @@
 package com.ninjaone.dundie_awards.application.activity;
 
-import com.ninjaone.dundie_awards.infrastructure.MessageBroker;
 import com.ninjaone.dundie_awards.infrastructure.repository.activity.Activity;
 import com.ninjaone.dundie_awards.infrastructure.repository.activity.ActivityRepository;
 import com.ninjaone.dundie_awards.infrastructure.repository.employee.EmployeeEvent;
@@ -13,9 +12,6 @@ public class ActivityEventListener implements ApplicationListener<EmployeeEvent>
 
     @Autowired
     private ActivityRepository activityRepository;
-
-    @Autowired
-    private MessageBroker messageBroker;
 
     @Autowired
     private ActivityProducer activityProducer;

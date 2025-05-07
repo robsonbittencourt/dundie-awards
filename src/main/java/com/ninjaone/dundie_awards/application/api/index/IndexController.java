@@ -1,9 +1,7 @@
 package com.ninjaone.dundie_awards.application.api.index;
 
-import com.ninjaone.dundie_awards.infrastructure.MessageBroker;
 import com.ninjaone.dundie_awards.infrastructure.cache.AwardsRedisCache;
 import com.ninjaone.dundie_awards.infrastructure.repository.activity.ActivityRepository;
-import com.ninjaone.dundie_awards.infrastructure.repository.employee.AwardsCache;
 import com.ninjaone.dundie_awards.infrastructure.repository.employee.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,19 +21,12 @@ public class IndexController {
     private ActivityRepository activityRepository;
 
     @Autowired
-    private MessageBroker messageBroker;
-
-    @Autowired
-    private AwardsCache awardsCache;
-
-    @Autowired
     private AwardsRedisCache awardsRedisCache;
 
     @GetMapping()
     public String getIndex(Model model) {
         model.addAttribute("employees", employeeRepository.findAll());
         model.addAttribute("activities", activityRepository.findAll());
-        model.addAttribute("queueMessages", messageBroker.getMessages());
         model.addAttribute("totalDundieAwards", awardsRedisCache.getCounter());
         return "index";
     }

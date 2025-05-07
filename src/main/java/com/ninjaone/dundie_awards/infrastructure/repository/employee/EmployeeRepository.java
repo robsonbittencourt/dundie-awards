@@ -17,9 +17,6 @@ public class EmployeeRepository {
     private EmployeeJpaRepository employeeRepository;
 
     @Autowired
-    private AwardsCache cache;
-
-    @Autowired
     private AwardsRedisCache awardsRedisCache;
 
     @Autowired
