@@ -31,11 +31,7 @@ public class EmployeeRepository {
         organization.setId(organizationId);
 
         Employee employee = new Employee(firstName, lastName, organization);
-        Employee persistedEmployee = employeeRepository.save(employee);
-
-        eventPublisher.publishEvent(new EmployeeEvent(this, "employee_created"));
-
-        return persistedEmployee;
+        return employeeRepository.save(employee);
     }
 
     public Optional<Employee> findById(Long id) {
@@ -58,8 +54,6 @@ public class EmployeeRepository {
         employee.get().setLastName(lastName);
         employeeRepository.save(employee.get());
 
-        eventPublisher.publishEvent(new EmployeeEvent(this, "employee_updated"));
-
         return employee;
     }
 
@@ -76,8 +70,6 @@ public class EmployeeRepository {
         int actualEmployeeDundies = employee.getDundieAwards() != null ? employee.getDundieAwards() : 0;
         int totalAwards = awardsRedisCache.getCounter().intValue() - actualEmployeeDundies;
         awardsRedisCache.updateCounter(totalAwards);
-
-        eventPublisher.publishEvent(new EmployeeEvent(this, "employee_deleted"));
 
         return true;
     }
