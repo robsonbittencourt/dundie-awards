@@ -12,8 +12,8 @@ public class AwardsRedisCache {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    public Long increment() {
-        return redisTemplate.opsForValue().increment(CACHE_NAME);
+    public void increment(long value) {
+        redisTemplate.opsForValue().increment(CACHE_NAME, value);
     }
 
     public Long getCounter() {

@@ -12,10 +12,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
-    public static final String ACTIVITY_EXCHANGE = "activity.exchange";
-
     public static final String ACTIVITY_QUEUE = "activity.queue";
-    public static final String LOG_QUEUE = "log.queue";
+    public static final String ACTIVITY_EXCHANGE = "activity.exchange";
+    public static final String ACTIVITY_ROUTING_KEY = "activity";
+
+    public static final String DUNDIE_DELIVERY_SPLIT_QUEUE = "dundie.delivery.split.queue";
+    public static final String DUNDIE_DELIVERY_SPLIT_EXCHANGE = "dundie.delivery.split.exchange";
+    public static final String DUNDIE_DELIVERY_SPLIT_ROUTING_KEY = "dundie.delivery.split";
+
+    public static final String DUNDIE_DELIVERY_QUEUE = "dundie.delivery.queue";
+    public static final String DUNDIE_DELIVERY_EXCHANGE = "dundie.delivery.exchange";
+    public static final String DUNDIE_DELIVERY_ROUTING_KEY = "dundie.delivery";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -26,25 +33,49 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Queue logQueue() {
-        return new Queue(LOG_QUEUE);
-    }
-
-    @Bean
-    public FanoutExchange fanoutExchange() {
-        return new FanoutExchange("activity.exchange");
+    public DirectExchange activityExchange() {
+        return new DirectExchange(ACTIVITY_EXCHANGE);
     }
 
     @Bean
     public Binding bindingActivityQueue() {
         return BindingBuilder.bind(activityQueue())
-            .to(fanoutExchange());
+            .to(activityExchange())
+            .with(ACTIVITY_ROUTING_KEY);
     }
 
     @Bean
-    public Binding bindingLogQueue() {
-        return BindingBuilder.bind(logQueue())
-            .to(fanoutExchange());
+    public Queue dundieDeliverySplitQueue() {
+        return new Queue(DUNDIE_DELIVERY_SPLIT_QUEUE);
+    }
+
+    @Bean
+    public DirectExchange dundieDeliverySplitExchange() {
+        return new DirectExchange(DUNDIE_DELIVERY_SPLIT_EXCHANGE);
+    }
+
+    @Bean
+    public Binding bindingDundieDeliverySplitQueue() {
+        return BindingBuilder.bind(dundieDeliverySplitQueue())
+            .to(dundieDeliverySplitExchange())
+            .with(DUNDIE_DELIVERY_SPLIT_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue dundieDeliveryQueue() {
+        return new Queue(DUNDIE_DELIVERY_QUEUE);
+    }
+
+    @Bean
+    public DirectExchange dundieDeliveryExchange() {
+        return new DirectExchange(DUNDIE_DELIVERY_EXCHANGE);
+    }
+
+    @Bean
+    public Binding bindingDundieDeliveryQueue() {
+        return BindingBuilder.bind(dundieDeliveryQueue())
+            .to(dundieDeliveryExchange())
+            .with(DUNDIE_DELIVERY_ROUTING_KEY);
     }
 
     @Bean

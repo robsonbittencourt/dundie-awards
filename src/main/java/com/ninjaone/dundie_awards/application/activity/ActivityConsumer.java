@@ -1,24 +1,40 @@
 package com.ninjaone.dundie_awards.application.activity;
 
-import com.ninjaone.dundie_awards.infrastructure.config.RabbitConfig;
 import com.ninjaone.dundie_awards.infrastructure.repository.activity.Activity;
+import com.ninjaone.dundie_awards.infrastructure.repository.activity.ActivityRepository;
+import com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+
+import static com.ninjaone.dundie_awards.infrastructure.config.RabbitConfig.ACTIVITY_QUEUE;
+import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.FINISHED;
 
 @Component
 public class ActivityConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(ActivityConsumer.class);
 
-    @RabbitListener(queues = RabbitConfig.ACTIVITY_QUEUE)
-    public void receive(Activity activity) {
-        log.info("Activity received: Event {} - Occurred at: {}", activity.getEvent(), activity.getOccuredAt());
+    @Autowired
+    private ActivityRepository activityRepository;
+
+    @Autowired
+    private DundieDeliveryRepository dundieDeliveryRepository;
+
+    @RabbitListener(queues = ACTIVITY_QUEUE)
+    public void receive(Long dundieDeliveryId) {
+        var searchResult = dundieDeliveryRepository.findByIdAndStatusWithLock(dundieDeliveryId, FINISHED);
+
+        searchResult.ifPresent(dundieDelivery -> {
+            Activity activity = new Activity(LocalDateTime.now(), "Dundie was delivered to organization " + dundieDelivery.getOrganizationId());
+            log.info("Activity received: Event {} - Occurred at: {}", activity.getEvent(), activity.getOccuredAt());
+
+            activityRepository.save(activity);
+        });
     }
 
-    @RabbitListener(queues = RabbitConfig.LOG_QUEUE)
-    public void log(Activity activity) {
-        log.info("Log: Event {} - Occurred at: {}", activity.getEvent(), activity.getOccuredAt());
-    }
 }

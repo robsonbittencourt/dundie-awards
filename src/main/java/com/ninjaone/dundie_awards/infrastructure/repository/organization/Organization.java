@@ -17,6 +17,10 @@ public class Organization {
 
   }
 
+  public Organization(long id) {
+    this.id = id;
+  }
+
   public Organization(String name) {
     super();
     this.name = name;

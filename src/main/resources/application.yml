@@ -1,8 +1,8 @@
-springdoc:
-  api-docs:
-    path: /openapi
 server:
   port: 3000
+
+app:
+  dundie-delivery-chunk-size: ${DUNDIE_DELIVERY_CHUNK_SIZE:10000}
 
 spring:
   application:
@@ -35,3 +35,7 @@ spring:
       static-locations: file:src/main/resources/static/
       cache:
         period: 0
+
+springdoc:
+  api-docs:
+    path: /openapi

@@ -3,7 +3,7 @@ package com.ninjaone.dundie_awards.infrastructure.repository.employee;
 import com.ninjaone.dundie_awards.infrastructure.cache.AwardsRedisCache;
 import com.ninjaone.dundie_awards.infrastructure.repository.organization.Organization;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,14 +13,14 @@ import java.util.Optional;
 @Repository
 public class EmployeeRepository {
 
+    @Value("${app.dundie-delivery-chunk-size}")
+    private int chunkSize;
+
     @Autowired
     private EmployeeJpaRepository employeeRepository;
 
     @Autowired
     private AwardsRedisCache awardsRedisCache;
-
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Employee create(String firstName, String lastName, Long organizationId) {
@@ -37,6 +37,10 @@ public class EmployeeRepository {
 
     public List<Employee> findAll() {
         return employeeRepository.findAll();
+    }
+
+    public List<EmployeeIds> findChunksOfEmployees(Long organizationId) {
+        return employeeRepository.findChunksOfEmployees(organizationId, chunkSize);
     }
 
     @Transactional
@@ -72,13 +76,12 @@ public class EmployeeRepository {
     }
 
     @Transactional
-    public boolean giveDundie(Long employeeId) {
-        int givenDundies = employeeRepository.giveDundie(employeeId);
+    public boolean giveDundie(Long organizationId, Long startId, Long endId) {
+        int givenDundies = employeeRepository.giveDundie(organizationId, startId, endId);
         boolean dundieWasDelivered = givenDundies > 0;
 
         if (dundieWasDelivered) {
-            awardsRedisCache.increment();
-            eventPublisher.publishEvent(new EmployeeEvent(this, "dundie_delivered"));
+            awardsRedisCache.increment(givenDundies);
         }
 
         return dundieWasDelivered;
