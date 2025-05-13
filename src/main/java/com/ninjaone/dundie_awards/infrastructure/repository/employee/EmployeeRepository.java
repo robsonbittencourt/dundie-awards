@@ -1,6 +1,5 @@
 package com.ninjaone.dundie_awards.infrastructure.repository.employee;
 
-import com.ninjaone.dundie_awards.infrastructure.cache.AwardsRedisCache;
 import com.ninjaone.dundie_awards.infrastructure.repository.organization.Organization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +19,7 @@ public class EmployeeRepository {
     private EmployeeJpaRepository employeeRepository;
 
     @Autowired
-    private AwardsRedisCache awardsRedisCache;
+    private DundiesCache dundiesCache;
 
     @Transactional
     public Employee create(String firstName, String lastName, Long organizationId) {
@@ -67,24 +66,24 @@ public class EmployeeRepository {
         }
 
         employeeRepository.deleteById(id);
-
-        int actualEmployeeDundies = employee.getDundieAwards() != null ? employee.getDundieAwards() : 0;
-        int totalAwards = awardsRedisCache.getCounter().intValue() - actualEmployeeDundies;
-        awardsRedisCache.updateCounter(totalAwards);
+        dundiesCache.resetCounter();
 
         return true;
     }
 
     @Transactional
-    public boolean giveDundie(Long organizationId, Long startId, Long endId) {
-        int givenDundies = employeeRepository.giveDundie(organizationId, startId, endId);
-        boolean dundieWasDelivered = givenDundies > 0;
+    public void giveDundie(Long organizationId, Long startId, Long endId) {
+        employeeRepository.giveDundie(organizationId, startId, endId);
+        dundiesCache.resetCounter();
+    }
 
-        if (dundieWasDelivered) {
-            awardsRedisCache.increment(givenDundies);
-        }
-
-        return dundieWasDelivered;
+    public long dundieQuantity() {
+        return dundiesCache.getCounter()
+            .orElseGet(() -> {
+                long totalDundies = employeeRepository.totalDundies();
+                dundiesCache.updateCounter(totalDundies);
+                return totalDundies;
+            });
     }
 
 }

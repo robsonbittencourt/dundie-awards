@@ -11,6 +11,12 @@ import java.util.List;
 @Repository
 interface EmployeeJpaRepository extends JpaRepository<Employee, Long> {
 
+    @Query(value = """
+        SELECT COALESCE(SUM(dundie_awards), 0)
+        FROM employees
+    """, nativeQuery = true)
+    long totalDundies();
+
     @Modifying
     @Query(value = """
         UPDATE employees
@@ -19,7 +25,7 @@ interface EmployeeJpaRepository extends JpaRepository<Employee, Long> {
             AND id >= :startId
             AND id <= :endId
     """, nativeQuery = true)
-    int giveDundie(@Param("organizationId") Long organizationId, @Param("startId") Long startId, @Param("endId") Long endId);
+    void giveDundie(@Param("organizationId") Long organizationId, @Param("startId") Long startId, @Param("endId") Long endId);
 
     @Query(value = """
         WITH numbered_employees AS (

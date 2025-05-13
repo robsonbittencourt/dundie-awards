@@ -25,14 +25,12 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
 
   redis:
-    image: redis:latest
+    image: redis:8.0.0-alpine
     container_name: redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
+    command: redis-server --save "" --appendonly no
 
 volumes:
   rabbitmq_data:
   postgres_data:
-  redis_data:

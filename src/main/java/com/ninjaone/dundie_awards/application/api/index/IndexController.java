@@ -1,6 +1,5 @@
 package com.ninjaone.dundie_awards.application.api.index;
 
-import com.ninjaone.dundie_awards.infrastructure.cache.AwardsRedisCache;
 import com.ninjaone.dundie_awards.infrastructure.repository.activity.ActivityRepository;
 import com.ninjaone.dundie_awards.infrastructure.repository.employee.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +19,11 @@ public class IndexController {
     @Autowired
     private ActivityRepository activityRepository;
 
-    @Autowired
-    private AwardsRedisCache awardsRedisCache;
-
     @GetMapping()
     public String getIndex(Model model) {
         model.addAttribute("employees", employeeRepository.findAll());
         model.addAttribute("activities", activityRepository.findAll());
-        model.addAttribute("totalDundieAwards", awardsRedisCache.getCounter());
+        model.addAttribute("totalDundieAwards", employeeRepository.dundieQuantity());
         return "index";
     }
 }

@@ -1,22 +1,17 @@
 package com.ninjaone.dundie_awards.infrastructure.repository.employee;
 
-import com.ninjaone.dundie_awards.infrastructure.cache.AwardsRedisCache;
 import com.ninjaone.dundie_awards.infrastructure.repository.organization.Organization;
 import com.ninjaone.dundie_awards.infrastructure.repository.organization.OrganizationRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
 
 @Component
 class DataLoader implements CommandLineRunner {
 
     private final EmployeeJpaRepository employeeRepository;
     private final OrganizationRepository organizationRepository;
-    private final AwardsRedisCache awardsCache;
 
-    public DataLoader(EmployeeJpaRepository employeeRepository, OrganizationRepository organizationRepository, AwardsRedisCache awardsCache) {
-        this.awardsCache = awardsCache;
+    public DataLoader(EmployeeJpaRepository employeeRepository, OrganizationRepository organizationRepository) {
         this.employeeRepository = employeeRepository;
         this.organizationRepository = organizationRepository;
     }
@@ -43,10 +38,5 @@ class DataLoader implements CommandLineRunner {
             employeeRepository.save(new Employee("Jim", "Halpert", organizationSquanchy));
             employeeRepository.save(new Employee("Pam", "Beesley", organizationSquanchy));
         }
-
-        int totalAwards = employeeRepository.findAll().stream()
-                .mapToInt(employee -> Objects.requireNonNullElse(employee.getDundieAwards(), 0))
-                .sum();
-        this.awardsCache.updateCounter(totalAwards);
     }
 }

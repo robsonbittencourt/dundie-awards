@@ -3,9 +3,10 @@ server:
 
 app:
   dundie-delivery-chunk-size: ${DUNDIE_DELIVERY_CHUNK_SIZE:10000}
+  dundie-count-cache-minutes: ${COUNT_CACHE_MINUTES:5}
   sentinel:
-    quantity-to-search: 10
-    delayed-minutes: 1
+    quantity-to-search: ${SENTINEL_QUANTITY_TO_SEARCH:10}
+    delayed-minutes: ${SENTINEL_DELAYED_MINUTES:1}
 
 spring:
   application:
