@@ -15,8 +15,10 @@ public class DundieDeliveryManager {
     @Autowired
     private DundieDeliverPublisher publisher;
 
-    public void giveDundieAwards(Long organizationId) {
+    public long giveDundieAwards(Long organizationId) {
         DundieDelivery dundieDelivery = dundieDeliveryRepository.create(organizationId);
         publisher.toDundieDeliverySplitQueue(dundieDelivery);
+
+        return dundieDelivery.getId();
     }
 }

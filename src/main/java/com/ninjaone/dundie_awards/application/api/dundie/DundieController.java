@@ -16,8 +16,8 @@ class DundieController {
     private DundieDeliveryManager dundieDeliveryManager;
 
     @PostMapping("/give-dundie-awards/{organizationId}")
-    ResponseEntity<Void> giveDundieAwards(@PathVariable Long organizationId) {
-        dundieDeliveryManager.giveDundieAwards(organizationId);
-        return ok().build();
+    ResponseEntity<GiveDundieAwardsResponse> giveDundieAwards(@PathVariable Long organizationId) {
+        long dundieDeliveryId = dundieDeliveryManager.giveDundieAwards(organizationId);
+        return ok(new GiveDundieAwardsResponse(dundieDeliveryId));
     }
 }

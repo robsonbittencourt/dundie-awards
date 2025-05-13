@@ -9,10 +9,9 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 import static com.ninjaone.dundie_awards.infrastructure.config.RabbitConfig.ACTIVITY_QUEUE;
 import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.DELIVERED;
+import static java.time.LocalDateTime.now;
 
 @Component
 public class ActivityConsumer {
@@ -30,7 +29,7 @@ public class ActivityConsumer {
         var searchResult = dundieDeliveryRepository.findByIdAndStatusWithLock(dundieDeliveryId, DELIVERED);
 
         searchResult.ifPresent(dundieDelivery -> {
-            Activity activity = new Activity(LocalDateTime.now(), "Dundie was delivered to organization " + dundieDelivery.getOrganizationId());
+            Activity activity = new Activity(now(), "Dundie was delivered to organization " + dundieDelivery.getOrganizationId());
             log.info("Activity received: Event {} - Occurred at: {}", activity.getEvent(), activity.getOccuredAt());
 
             activityRepository.save(activity);
