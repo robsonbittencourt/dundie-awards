@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 import static com.ninjaone.dundie_awards.infrastructure.config.RabbitConfig.ACTIVITY_QUEUE;
-import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.FINISHED;
+import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.DELIVERED;
 
 @Component
 public class ActivityConsumer {
@@ -27,13 +27,14 @@ public class ActivityConsumer {
 
     @RabbitListener(queues = ACTIVITY_QUEUE)
     public void receive(Long dundieDeliveryId) {
-        var searchResult = dundieDeliveryRepository.findByIdAndStatusWithLock(dundieDeliveryId, FINISHED);
+        var searchResult = dundieDeliveryRepository.findByIdAndStatusWithLock(dundieDeliveryId, DELIVERED);
 
         searchResult.ifPresent(dundieDelivery -> {
             Activity activity = new Activity(LocalDateTime.now(), "Dundie was delivered to organization " + dundieDelivery.getOrganizationId());
             log.info("Activity received: Event {} - Occurred at: {}", activity.getEvent(), activity.getOccuredAt());
 
             activityRepository.save(activity);
+            dundieDeliveryRepository.toFinished(dundieDelivery);
         });
     }
 

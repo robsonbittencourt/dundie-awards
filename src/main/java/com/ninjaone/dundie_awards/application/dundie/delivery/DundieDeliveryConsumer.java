@@ -1,9 +1,9 @@
 package com.ninjaone.dundie_awards.application.dundie.delivery;
 
 import com.ninjaone.dundie_awards.application.dundie.publisher.DundieDeliverPublisher;
-import com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDelivery;
 import com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunk;
 import com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkRepository;
+import com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDelivery;
 import com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryRepository;
 import com.ninjaone.dundie_awards.infrastructure.repository.employee.EmployeeRepository;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import static com.ninjaone.dundie_awards.infrastructure.config.RabbitConfig.DUNDIE_DELIVERY_QUEUE;
-import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.PENDING_SPLIT;
+import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkStatus.PENDING;
 import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
 
 @Component
@@ -42,7 +42,7 @@ public class DundieDeliveryConsumer {
     @Transactional
     @RabbitListener(queues = DUNDIE_DELIVERY_QUEUE)
     public void receive(Long chunkId) {
-        var searchResult = dundieDeliveryChunkRepository.findByIdAndStatusWithLock(chunkId, PENDING_SPLIT);
+        var searchResult = dundieDeliveryChunkRepository.findByIdAndStatusWithLock(chunkId, PENDING);
 
         searchResult.ifPresent(chunk -> {
             addLog(chunk);
@@ -62,7 +62,7 @@ public class DundieDeliveryConsumer {
         boolean exists = dundieDeliveryChunkRepository.hasPendingChunk(dundieDelivery.getId());
 
         if (!exists) {
-            dundieDeliveryRepository.toFinished(dundieDelivery);
+            dundieDeliveryRepository.toDelivered(dundieDelivery);
             eventPublisher.publishEvent(new DundieDeliveryFinished(this, dundieDelivery.getId()));
         }
     }

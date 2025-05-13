@@ -1,10 +1,11 @@
 package com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk;
 
 import com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDelivery;
-import com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+
+import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkStatus.PENDING;
 
 @Entity
 @Table(name = "dundie_delivery_chunk")
@@ -31,7 +32,7 @@ public class DundieDeliveryChunk {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private DundieDeliveryStatusEnum status;
+    private DundieDeliveryChunkStatus status;
 
     public DundieDeliveryChunk() {
     }
@@ -41,7 +42,7 @@ public class DundieDeliveryChunk {
         this.startEmployeeId = startEmployeeId;
         this.endEmployeeId = endEmployeeId;
         this.createdAt = LocalDateTime.now();
-        this.status = DundieDeliveryStatusEnum.PENDING_SPLIT;
+        this.status = PENDING;
     }
 
     public long getId() {
@@ -72,11 +73,11 @@ public class DundieDeliveryChunk {
         return dundieDelivery.getOrganizationId();
     }
 
-    public DundieDeliveryStatusEnum getStatus() {
+    public DundieDeliveryChunkStatus getStatus() {
         return status;
     }
 
-    public void setStatus(DundieDeliveryStatusEnum status) {
+    public void setStatus(DundieDeliveryChunkStatus status) {
         this.status = status;
     }
 

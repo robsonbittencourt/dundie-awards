@@ -1,12 +1,12 @@
 package com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk;
 
-import com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
@@ -20,7 +20,7 @@ public interface DundieDeliveryChunkJpaRepository extends JpaRepository<DundieDe
         WHERE c.dundieDelivery.id = :dundieDeliveryId
             AND c.status = :status
     """)
-    boolean existsByDundieDeliveryIdAndStatus(@Param("dundieDeliveryId") Long dundieDeliveryId, @Param("status") DundieDeliveryStatusEnum status);
+    boolean existsByDundieDeliveryIdAndStatus(@Param("dundieDeliveryId") Long dundieDeliveryId, @Param("status") DundieDeliveryChunkStatus status);
 
     @Query("""
         SELECT d
@@ -29,6 +29,15 @@ public interface DundieDeliveryChunkJpaRepository extends JpaRepository<DundieDe
             AND d.status = :status
     """)
     @Lock(PESSIMISTIC_WRITE)
-    Optional<DundieDeliveryChunk> findByIdAndStatusWithLock(@Param("id") Long id, @Param("status") DundieDeliveryStatusEnum status);
+    Optional<DundieDeliveryChunk> findByIdAndStatusWithLock(@Param("id") Long id, @Param("status") DundieDeliveryChunkStatus status);
 
+    @Query(value = """
+        SELECT * FROM dundie_delivery_chunk
+        WHERE status = :status
+            AND created_at < CURRENT_TIMESTAMP - (:minutes * INTERVAL '1 minute')
+        ORDER BY created_at ASC
+        LIMIT :quantity
+        FOR UPDATE
+    """, nativeQuery = true)
+    List<DundieDeliveryChunk> findTopByStatusWithMoreThanMinutes(@Param("status") String status, @Param("quantity") int quantity, @Param("minutes") int minutes);
 }

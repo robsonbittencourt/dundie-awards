@@ -6,6 +6,10 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.PENDING_SPLIT;
+import static java.time.LocalDateTime.now;
+import static java.util.UUID.randomUUID;
+
 @Entity
 @Table(name = "dundie_delivery")
 public class DundieDelivery {
@@ -19,6 +23,9 @@ public class DundieDelivery {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Column(name = "finished_at")
     private LocalDateTime finishedAt;
@@ -34,10 +41,11 @@ public class DundieDelivery {
     }
 
     public DundieDelivery(Long organizationId) {
-        this.identifier = UUID.randomUUID();
-        this.createdAt = LocalDateTime.now();
+        this.identifier = randomUUID();
+        this.createdAt = now();
+        this.updatedAt = now();
         this.organization = new Organization(organizationId);
-        this.status = DundieDeliveryStatusEnum.PENDING_SPLIT;
+        this.status = PENDING_SPLIT;
     }
 
     public long getId() {
@@ -52,8 +60,20 @@ public class DundieDelivery {
         return createdAt;
     }
 
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public LocalDateTime getFinishedAt() {
         return finishedAt;
+    }
+
+    public void setFinishedAt(LocalDateTime finishedAt) {
+        this.finishedAt = finishedAt;
     }
 
     public Organization getOrganization() {
@@ -66,10 +86,6 @@ public class DundieDelivery {
 
     public DundieDeliveryStatusEnum getStatus() {
         return status;
-    }
-
-    public void setFinishedAt(LocalDateTime finishedAt) {
-        this.finishedAt = finishedAt;
     }
 
     public void setStatus(DundieDeliveryStatusEnum status) {

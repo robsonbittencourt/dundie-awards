@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.*;
@@ -34,18 +35,34 @@ public class DundieDeliveryRepository {
     @Transactional
     public void toRunning(DundieDelivery dundieDelivery) {
         dundieDelivery.setStatus(RUNNING);
+        dundieDelivery.setUpdatedAt(now());
         jpaRepository.save(dundieDelivery);
 
         createDundieDeliveryStatus(dundieDelivery, RUNNING);
     }
 
     @Transactional
+    public void toDelivered(DundieDelivery dundieDelivery) {
+        dundieDelivery.setStatus(DELIVERED);
+        dundieDelivery.setUpdatedAt(now());
+        jpaRepository.save(dundieDelivery);
+
+        createDundieDeliveryStatus(dundieDelivery, DELIVERED);
+    }
+
+    @Transactional
     public void toFinished(DundieDelivery dundieDelivery) {
         dundieDelivery.setStatus(FINISHED);
+        dundieDelivery.setUpdatedAt(now());
         dundieDelivery.setFinishedAt(now());
         jpaRepository.save(dundieDelivery);
 
         createDundieDeliveryStatus(dundieDelivery, FINISHED);
+    }
+
+    @Transactional
+    public List<DundieDelivery> findTopByStatusWithMoreThanMinutes(DundieDeliveryStatusEnum status, int quantity, int minutes) {
+        return jpaRepository.findTopByStatusWithMoreThanMinutes(status.name(), quantity, minutes);
     }
 
     private void createDundieDeliveryStatus(DundieDelivery dundieDelivery, DundieDeliveryStatusEnum deliveryStatus) {

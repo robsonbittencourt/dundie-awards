@@ -3,6 +3,9 @@ server:
 
 app:
   dundie-delivery-chunk-size: ${DUNDIE_DELIVERY_CHUNK_SIZE:10000}
+  sentinel:
+    quantity-to-search: 10
+    delayed-minutes: 1
 
 spring:
   application:

@@ -6,12 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 
 @Repository
-public interface DundieDeliveryJpaRepository extends JpaRepository<DundieDelivery, Long> {
+interface DundieDeliveryJpaRepository extends JpaRepository<DundieDelivery, Long> {
 
     @Query("""
         SELECT d
@@ -21,5 +22,15 @@ public interface DundieDeliveryJpaRepository extends JpaRepository<DundieDeliver
     """)
     @Lock(PESSIMISTIC_WRITE)
     Optional<DundieDelivery> findByIdAndStatusWithLock(@Param("id") Long id, @Param("status") DundieDeliveryStatusEnum status);
+
+    @Query(value = """
+        SELECT * FROM dundie_delivery
+        WHERE status = :status
+            AND updated_at < CURRENT_TIMESTAMP - (:minutes * INTERVAL '1 minute')
+        ORDER BY updated_at ASC
+        LIMIT :quantity
+        FOR UPDATE
+    """, nativeQuery = true)
+    List<DundieDelivery> findTopByStatusWithMoreThanMinutes(@Param("status") String status, @Param("quantity") int quantity, @Param("minutes") int minutes);
 
 }
