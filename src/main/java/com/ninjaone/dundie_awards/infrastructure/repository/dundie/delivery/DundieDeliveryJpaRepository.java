@@ -8,11 +8,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 
 @Repository
 interface DundieDeliveryJpaRepository extends JpaRepository<DundieDelivery, Long> {
+
+    Optional<DundieDelivery> findByIdentifier(UUID identifier);
 
     @Query("""
         SELECT d

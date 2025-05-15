@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.*;
 import static java.time.LocalDateTime.now;
@@ -20,6 +21,10 @@ public class DundieDeliveryRepository {
 
     @Autowired
     private DundieDeliveryStatusJpaRepository dundieDeliveryStatusJpaRepository;
+
+    public Optional<DundieDelivery> findByIdentifier(UUID identifier) {
+        return jpaRepository.findByIdentifier(identifier);
+    }
 
     @Transactional
     public DundieDelivery create(Long organizationId) {

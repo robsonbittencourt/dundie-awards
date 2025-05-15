@@ -6,6 +6,8 @@ import com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.Dund
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class DundieDeliveryManager {
 
@@ -15,10 +17,10 @@ public class DundieDeliveryManager {
     @Autowired
     private DundieDeliverPublisher publisher;
 
-    public long giveDundieAwards(Long organizationId) {
+    public UUID giveDundieAwards(Long organizationId) {
         DundieDelivery dundieDelivery = dundieDeliveryRepository.create(organizationId);
         publisher.toDundieDeliverySplitQueue(dundieDelivery.getId());
 
-        return dundieDelivery.getId();
+        return dundieDelivery.getIdentifier();
     }
 }

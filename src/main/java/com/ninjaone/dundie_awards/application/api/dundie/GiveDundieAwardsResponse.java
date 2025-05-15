@@ -1,4 +1,6 @@
 package com.ninjaone.dundie_awards.application.api.dundie;
 
-public record GiveDundieAwardsResponse(long deliveryId) {
+import java.util.UUID;
+
+record GiveDundieAwardsResponse(UUID deliveryId) {
 }
