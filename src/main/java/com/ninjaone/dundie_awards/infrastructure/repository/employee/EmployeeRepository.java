@@ -3,6 +3,8 @@ package com.ninjaone.dundie_awards.infrastructure.repository.employee;
 import com.ninjaone.dundie_awards.infrastructure.repository.organization.Organization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +18,7 @@ public class EmployeeRepository {
     private int chunkSize;
 
     @Autowired
-    private EmployeeJpaRepository employeeRepository;
+    private EmployeeJpaRepository jpaRepository;
 
     @Autowired
     private DundiesCache dundiesCache;
@@ -27,24 +29,28 @@ public class EmployeeRepository {
         organization.setId(organizationId);
 
         Employee employee = new Employee(firstName, lastName, organization);
-        return employeeRepository.save(employee);
+        return jpaRepository.save(employee);
     }
 
     public Optional<Employee> findById(Long id) {
-        return employeeRepository.findById(id);
+        return jpaRepository.findById(id);
     }
 
-    public List<Employee> findAll() {
-        return employeeRepository.findAll();
+    public Page<Employee> findAll(Pageable pageable) {
+        if (pageable.getPageSize() > 10) {
+            throw new IllegalArgumentException("Page size should be less than 10");
+        }
+
+        return jpaRepository.findAll(pageable);
     }
 
     public List<EmployeeIds> findChunksOfEmployees(Long organizationId) {
-        return employeeRepository.findChunksOfEmployees(organizationId, chunkSize);
+        return jpaRepository.findChunksOfEmployees(organizationId, chunkSize);
     }
 
     @Transactional
     public Optional<Employee> updateName(Long id, String firstName, String lastName) {
-        Optional<Employee> employee = employeeRepository.findById(id);
+        Optional<Employee> employee = jpaRepository.findById(id);
 
         if (employee.isEmpty()) {
             return employee;
@@ -52,20 +58,20 @@ public class EmployeeRepository {
 
         employee.get().setFirstName(firstName);
         employee.get().setLastName(lastName);
-        employeeRepository.save(employee.get());
+        jpaRepository.save(employee.get());
 
         return employee;
     }
 
     @Transactional
     public boolean delete(Long id) {
-        Employee employee = employeeRepository.findById(id).orElse(null);
+        Employee employee = jpaRepository.findById(id).orElse(null);
 
         if (employee == null) {
             return false;
         }
 
-        employeeRepository.deleteById(id);
+        jpaRepository.deleteById(id);
         dundiesCache.resetCounter();
 
         return true;
@@ -73,14 +79,14 @@ public class EmployeeRepository {
 
     @Transactional
     public void giveDundie(Long organizationId, Long startId, Long endId, int quantity) {
-        employeeRepository.giveDundie(organizationId, startId, endId, quantity);
+        jpaRepository.giveDundie(organizationId, startId, endId, quantity);
         dundiesCache.resetCounter();
     }
 
     public long dundieQuantity() {
         return dundiesCache.getCounter()
             .orElseGet(() -> {
-                long totalDundies = employeeRepository.totalDundies();
+                long totalDundies = jpaRepository.totalDundies();
                 dundiesCache.updateCounter(totalDundies);
                 return totalDundies;
             });

@@ -4,11 +4,13 @@ import com.ninjaone.dundie_awards.infrastructure.repository.employee.Employee;
 import com.ninjaone.dundie_awards.infrastructure.repository.employee.EmployeeRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -20,10 +22,9 @@ public class EmployeeController {
     private EmployeeRepository employeeRepository;
 
     @GetMapping()
-    List<EmployeeResponse> getAllEmployees() {
-        return employeeRepository.findAll().stream()
-            .map(EmployeeResponse::new)
-            .toList();
+    Page<EmployeeResponse> getAllEmployees(@PageableDefault(sort = "id", direction = ASC) Pageable pageable) {
+        return employeeRepository.findAll(pageable)
+            .map(EmployeeResponse::new);
     }
 
     @PostMapping()
