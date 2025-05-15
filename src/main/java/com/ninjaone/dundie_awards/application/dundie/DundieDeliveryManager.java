@@ -17,7 +17,7 @@ public class DundieDeliveryManager {
 
     public long giveDundieAwards(Long organizationId) {
         DundieDelivery dundieDelivery = dundieDeliveryRepository.create(organizationId);
-        publisher.toDundieDeliverySplitQueue(dundieDelivery);
+        publisher.toDundieDeliverySplitQueue(dundieDelivery.getId());
 
         return dundieDelivery.getId();
     }

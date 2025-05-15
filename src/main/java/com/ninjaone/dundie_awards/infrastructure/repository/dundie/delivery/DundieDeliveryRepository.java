@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.*;
 import static java.time.LocalDateTime.now;
+import static java.util.Arrays.stream;
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
 @Repository
@@ -85,8 +86,9 @@ public class DundieDeliveryRepository {
     }
 
     @Transactional
-    public List<DundieDelivery> findTopByStatusWithMoreThanMinutes(DundieDeliveryStatusEnum status, int quantity, int minutes) {
-        return jpaRepository.findTopByStatusWithMoreThanMinutes(status.name(), quantity, minutes);
+    public List<DundieDelivery> findTopByStatusWithDelay(int quantity, int minutes, DundieDeliveryStatusEnum ...status) {
+        List<String> statusList = stream(status).map(Enum::name).toList();
+        return jpaRepository.findTopByStatusWithMoreThanMinutes(quantity, minutes, statusList);
     }
 
     private void createDundieDeliveryStatus(DundieDelivery dundieDelivery, DundieDeliveryStatusEnum deliveryStatus) {

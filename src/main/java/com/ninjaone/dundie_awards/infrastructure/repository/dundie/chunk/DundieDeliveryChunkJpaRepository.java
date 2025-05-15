@@ -34,13 +34,13 @@ interface DundieDeliveryChunkJpaRepository extends JpaRepository<DundieDeliveryC
 
     @Query(value = """
         SELECT * FROM dundie_delivery_chunk
-        WHERE status = :status
+        WHERE status IN (:status)
             AND created_at < CURRENT_TIMESTAMP - (:minutes * INTERVAL '1 minute')
         ORDER BY created_at ASC
         LIMIT :quantity
         FOR UPDATE
     """, nativeQuery = true)
-    List<DundieDeliveryChunk> findTopByStatusWithMoreThanMinutes(@Param("status") String status, @Param("quantity") int quantity, @Param("minutes") int minutes);
+    List<DundieDeliveryChunk> findTopByStatusWithDelay(@Param("quantity") int quantity, @Param("minutes") int minutes, @Param("status") List<String> status);
 
     @Modifying
     @Query(value = """

@@ -25,12 +25,12 @@ interface DundieDeliveryJpaRepository extends JpaRepository<DundieDelivery, Long
 
     @Query(value = """
         SELECT * FROM dundie_delivery
-        WHERE status = :status
+        WHERE status in (:status)
             AND updated_at < CURRENT_TIMESTAMP - (:minutes * INTERVAL '1 minute')
         ORDER BY updated_at ASC
         LIMIT :quantity
         FOR UPDATE
     """, nativeQuery = true)
-    List<DundieDelivery> findTopByStatusWithMoreThanMinutes(@Param("status") String status, @Param("quantity") int quantity, @Param("minutes") int minutes);
+    List<DundieDelivery> findTopByStatusWithMoreThanMinutes(@Param("quantity") int quantity, @Param("minutes") int minutes, @Param("status") List<String> status);
 
 }

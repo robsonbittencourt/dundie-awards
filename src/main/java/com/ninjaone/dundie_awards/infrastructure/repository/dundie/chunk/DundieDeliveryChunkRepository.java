@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkStatus.FINISHED;
 import static java.time.LocalDateTime.now;
+import static java.util.Arrays.stream;
 
 @Repository
 public class DundieDeliveryChunkRepository {
@@ -54,8 +55,9 @@ public class DundieDeliveryChunkRepository {
     }
 
     @Transactional
-    public List<DundieDeliveryChunk> findTopPendingChunksWithMoreThanMinutes(DundieDeliveryChunkStatus status, int quantity, int minutes) {
-        return jpaRepository.findTopByStatusWithMoreThanMinutes(status.name(), quantity, minutes);
+    public List<DundieDeliveryChunk> findTopPendingChunksWithDelay(int quantity, int minutes, DundieDeliveryChunkStatus ...status) {
+        List<String> statusList = stream(status).map(Enum::name).toList();
+        return jpaRepository.findTopByStatusWithDelay(quantity, minutes, statusList);
     }
 
 }

@@ -1,6 +1,5 @@
 package com.ninjaone.dundie_awards.application.dundie.publisher;
 
-import com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDelivery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -17,12 +16,12 @@ public class DundieDeliverPublisher {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    public void toDundieDeliverySplitQueue(DundieDelivery dundieDelivery) {
-        sendToQueue(DUNDIE_DELIVERY_SPLIT_EXCHANGE, DUNDIE_DELIVERY_SPLIT_ROUTING_KEY, DUNDIE_DELIVERY_SPLIT_QUEUE, dundieDelivery.getId());
+    public void toDundieDeliverySplitQueue(Long dundieDeliveryId) {
+        sendToQueue(DUNDIE_DELIVERY_SPLIT_EXCHANGE, DUNDIE_DELIVERY_SPLIT_ROUTING_KEY, DUNDIE_DELIVERY_SPLIT_QUEUE, dundieDeliveryId);
     }
 
-    public void toDundieDeliverySplitRollbackQueue(Long dundieDelivery) {
-        sendToQueue(DUNDIE_DELIVERY_SPLIT_ROLLBACK_EXCHANGE, DUNDIE_DELIVERY_SPLIT_ROLLBACK_ROUTING_KEY, DUNDIE_DELIVERY_SPLIT_ROLLBACK_QUEUE, dundieDelivery);
+    public void toDundieDeliverySplitRollbackQueue(Long dundieDeliveryId) {
+        sendToQueue(DUNDIE_DELIVERY_SPLIT_ROLLBACK_EXCHANGE, DUNDIE_DELIVERY_SPLIT_ROLLBACK_ROUTING_KEY, DUNDIE_DELIVERY_SPLIT_ROLLBACK_QUEUE, dundieDeliveryId);
     }
 
     public void toDundieDeliveryQueue(Long chunkId) {
