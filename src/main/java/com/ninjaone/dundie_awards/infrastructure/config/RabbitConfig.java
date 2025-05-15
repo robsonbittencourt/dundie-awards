@@ -24,6 +24,14 @@ public class RabbitConfig {
     public static final String DUNDIE_DELIVERY_EXCHANGE = "dundie.delivery.exchange";
     public static final String DUNDIE_DELIVERY_ROUTING_KEY = "dundie.delivery";
 
+    public static final String DUNDIE_DELIVERY_SPLIT_ROLLBACK_QUEUE = "dundie.delivery.split.rollback.queue";
+    public static final String DUNDIE_DELIVERY_SPLIT_ROLLBACK_EXCHANGE = "dundie.delivery.split.rollback.exchange";
+    public static final String DUNDIE_DELIVERY_SPLIT_ROLLBACK_ROUTING_KEY = "dundie.delivery.split.rollback";
+
+    public static final String DUNDIE_DELIVERY_ROLLBACK_QUEUE = "dundie.delivery.rollback.queue";
+    public static final String DUNDIE_DELIVERY_ROLLBACK_EXCHANGE = "dundie.delivery.rollback.exchange";
+    public static final String DUNDIE_DELIVERY_ROLLBACK_ROUTING_KEY = "dundie.delivery.rollback";
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -76,6 +84,40 @@ public class RabbitConfig {
         return BindingBuilder.bind(dundieDeliveryQueue())
             .to(dundieDeliveryExchange())
             .with(DUNDIE_DELIVERY_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue dundieDeliverySplitRollbackQueue() {
+        return new Queue(DUNDIE_DELIVERY_SPLIT_ROLLBACK_QUEUE);
+    }
+
+    @Bean
+    public DirectExchange dundieDeliverySplitRollbackExchange() {
+        return new DirectExchange(DUNDIE_DELIVERY_SPLIT_ROLLBACK_EXCHANGE);
+    }
+
+    @Bean
+    public Binding bindingDundieDeliverySplitRollbackQueue() {
+        return BindingBuilder.bind(dundieDeliverySplitRollbackQueue())
+            .to(dundieDeliverySplitRollbackExchange())
+            .with(DUNDIE_DELIVERY_SPLIT_ROLLBACK_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue dundieDeliveryRollbackQueue() {
+        return new Queue(DUNDIE_DELIVERY_ROLLBACK_QUEUE);
+    }
+
+    @Bean
+    public DirectExchange dundieDeliveryRollbackExchange() {
+        return new DirectExchange(DUNDIE_DELIVERY_ROLLBACK_EXCHANGE);
+    }
+
+    @Bean
+    public Binding bindingDundieDeliveryRollbackQueue() {
+        return BindingBuilder.bind(dundieDeliveryRollbackQueue())
+            .to(dundieDeliveryRollbackExchange())
+            .with(DUNDIE_DELIVERY_ROLLBACK_ROUTING_KEY);
     }
 
     @Bean

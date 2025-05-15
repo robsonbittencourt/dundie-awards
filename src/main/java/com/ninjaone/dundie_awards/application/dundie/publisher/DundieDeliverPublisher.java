@@ -21,8 +21,16 @@ public class DundieDeliverPublisher {
         sendToQueue(DUNDIE_DELIVERY_SPLIT_EXCHANGE, DUNDIE_DELIVERY_SPLIT_ROUTING_KEY, DUNDIE_DELIVERY_SPLIT_QUEUE, dundieDelivery.getId());
     }
 
+    public void toDundieDeliverySplitRollbackQueue(Long dundieDelivery) {
+        sendToQueue(DUNDIE_DELIVERY_SPLIT_ROLLBACK_EXCHANGE, DUNDIE_DELIVERY_SPLIT_ROLLBACK_ROUTING_KEY, DUNDIE_DELIVERY_SPLIT_ROLLBACK_QUEUE, dundieDelivery);
+    }
+
     public void toDundieDeliveryQueue(Long chunkId) {
         sendToQueue(DUNDIE_DELIVERY_EXCHANGE, DUNDIE_DELIVERY_ROUTING_KEY, DUNDIE_DELIVERY_QUEUE, chunkId);
+    }
+
+    public void toDundieDeliveryRollbackQueue(Long chunkId) {
+        sendToQueue(DUNDIE_DELIVERY_ROLLBACK_EXCHANGE, DUNDIE_DELIVERY_ROLLBACK_ROUTING_KEY, DUNDIE_DELIVERY_ROLLBACK_QUEUE, chunkId);
     }
 
     public void toActivityQueue(Long dundieDeliveryId) {

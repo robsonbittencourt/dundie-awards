@@ -20,12 +20,12 @@ interface EmployeeJpaRepository extends JpaRepository<Employee, Long> {
     @Modifying
     @Query(value = """
         UPDATE employees
-        SET dundie_awards = COALESCE(dundie_awards, 0) + 1
+        SET dundie_awards = COALESCE(dundie_awards, 0) + :quantity
         WHERE organization_id = :organizationId
             AND id >= :startId
             AND id <= :endId
     """, nativeQuery = true)
-    void giveDundie(@Param("organizationId") Long organizationId, @Param("startId") Long startId, @Param("endId") Long endId);
+    void giveDundie(@Param("organizationId") Long organizationId, @Param("startId") Long startId, @Param("endId") Long endId, @Param("quantity") int quantity);
 
     @Query(value = """
         WITH numbered_employees AS (

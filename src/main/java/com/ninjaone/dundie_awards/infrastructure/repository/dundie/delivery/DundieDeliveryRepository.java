@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.*;
 import static java.time.LocalDateTime.now;
+import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
 @Repository
 public class DundieDeliveryRepository {
@@ -58,6 +59,29 @@ public class DundieDeliveryRepository {
         jpaRepository.save(dundieDelivery);
 
         createDundieDeliveryStatus(dundieDelivery, FINISHED);
+    }
+
+    @Transactional(propagation = REQUIRES_NEW)
+    public void toErrorOnActivity(Long dundieDeliveryId) {
+        var searchResult = jpaRepository.findById(dundieDeliveryId);
+
+        searchResult.ifPresent(dundieDelivery -> {
+            dundieDelivery.setStatus(ERROR_ON_ACTIVITY);
+            dundieDelivery.setUpdatedAt(now());
+            jpaRepository.save(dundieDelivery);
+
+            createDundieDeliveryStatus(dundieDelivery, ERROR_ON_ACTIVITY);
+        });
+    }
+
+    @Transactional
+    public void toUndone(DundieDelivery dundieDelivery) {
+        dundieDelivery.setStatus(UNDONE);
+        dundieDelivery.setUpdatedAt(now());
+        dundieDelivery.setFinishedAt(now());
+        jpaRepository.save(dundieDelivery);
+
+        createDundieDeliveryStatus(dundieDelivery, UNDONE);
     }
 
     @Transactional

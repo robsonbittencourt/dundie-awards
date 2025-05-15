@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkStatus.PENDING;
+import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkStatus.FINISHED;
 import static java.time.LocalDateTime.now;
 
 @Repository
@@ -30,22 +30,31 @@ public class DundieDeliveryChunkRepository {
     }
 
     @Transactional
+    public void createRollbackChunksToDelivery(Long deliveryId) {
+        jpaRepository.createRollbackChunksToDelivery(deliveryId);
+    }
+
+    @Transactional
     public Optional<DundieDeliveryChunk> findByIdAndStatusWithLock(Long id, DundieDeliveryChunkStatus status) {
         return jpaRepository.findByIdAndStatusWithLock(id, status);
     }
 
+    public List<Long> findIdsByDundieDeliveryIdAndStatus(Long deliveryId, DundieDeliveryChunkStatus status) {
+        return jpaRepository.findIdsByStatusAndDundieDeliveryId(status, deliveryId);
+    }
+
     public void toFinished(DundieDeliveryChunk chunk) {
-        chunk.setStatus(DundieDeliveryChunkStatus.FINISHED);
+        chunk.setStatus(FINISHED);
         chunk.setFinishedAt(now());
         jpaRepository.save(chunk);
     }
 
-    public boolean hasPendingChunk(Long dundieDeliveryId) {
-        return jpaRepository.existsByDundieDeliveryIdAndStatus(dundieDeliveryId, PENDING);
+    public boolean hasPendingChunk(Long dundieDeliveryId, DundieDeliveryChunkStatus status) {
+        return jpaRepository.existsByDundieDeliveryIdAndStatus(dundieDeliveryId, status);
     }
 
     @Transactional
-    public List<DundieDeliveryChunk> findTopPendingChunksWithMoreThan5Minutes(DundieDeliveryChunkStatus status, int quantity, int minutes) {
+    public List<DundieDeliveryChunk> findTopPendingChunksWithMoreThanMinutes(DundieDeliveryChunkStatus status, int quantity, int minutes) {
         return jpaRepository.findTopByStatusWithMoreThanMinutes(status.name(), quantity, minutes);
     }
 

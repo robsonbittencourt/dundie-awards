@@ -72,8 +72,8 @@ public class EmployeeRepository {
     }
 
     @Transactional
-    public void giveDundie(Long organizationId, Long startId, Long endId) {
-        employeeRepository.giveDundie(organizationId, startId, endId);
+    public void giveDundie(Long organizationId, Long startId, Long endId, int quantity) {
+        employeeRepository.giveDundie(organizationId, startId, endId, quantity);
         dundiesCache.resetCounter();
     }
 

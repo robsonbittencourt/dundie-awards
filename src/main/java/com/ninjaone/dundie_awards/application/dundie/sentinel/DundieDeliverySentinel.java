@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkStatus.PENDING;
-import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.DELIVERED;
-import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.PENDING_SPLIT;
+import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkStatus.PENDING_ROLLBACK;
+import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.*;
 
 @Component
 public class DundieDeliverySentinel {
@@ -43,7 +43,7 @@ public class DundieDeliverySentinel {
         if (rabbitHealthChecker.isOnline()) {
             var pendingDeliveries = dundieDeliveryRepository.findTopByStatusWithMoreThanMinutes(PENDING_SPLIT, quantityToSearch, delayedMinutes);
 
-            log.info("Looking for pending Dundie Deliveries. Found: {}", pendingDeliveries.size());
+            log.info("Looking for PENDING_SPLIT Dundie Deliveries. Found: {}", pendingDeliveries.size());
 
             pendingDeliveries.forEach(dundieDelivery -> publisher.toDundieDeliverySplitQueue(dundieDelivery));
         }
@@ -52,11 +52,22 @@ public class DundieDeliverySentinel {
     @Scheduled(fixedDelay = 60000L)
     public void restartPendingDeliveryChunks() {
         if (rabbitHealthChecker.isOnline()) {
-            var pendingChunks = dundieDeliveryChunkRepository.findTopPendingChunksWithMoreThan5Minutes(PENDING, quantityToSearch, delayedMinutes);
+            var pendingChunks = dundieDeliveryChunkRepository.findTopPendingChunksWithMoreThanMinutes(PENDING, quantityToSearch, delayedMinutes);
 
-            log.info("Looking for pending Dundie Delivery Chunks. Found: {}", pendingChunks.size());
+            log.info("Looking for PENDING Dundie Delivery Chunks. Found: {}", pendingChunks.size());
 
             pendingChunks.forEach(chunk -> publisher.toDundieDeliveryQueue(chunk.getId()));
+        }
+    }
+
+    @Scheduled(fixedDelay = 60000L)
+    public void restartPendingRollbackDeliveryChunks() {
+        if (rabbitHealthChecker.isOnline()) {
+            var pendingChunks = dundieDeliveryChunkRepository.findTopPendingChunksWithMoreThanMinutes(PENDING_ROLLBACK, quantityToSearch, delayedMinutes);
+
+            log.info("Looking for PENDING_ROLLBACK Dundie Delivery Chunks. Found: {}", pendingChunks.size());
+
+            pendingChunks.forEach(chunk -> publisher.toDundieDeliveryRollbackQueue(chunk.getId()));
         }
     }
 
@@ -68,6 +79,17 @@ public class DundieDeliverySentinel {
             log.info("Looking for pending Dundie Deliveries to Activity. Found: {}", deliveriesToActivity.size());
 
             deliveriesToActivity.forEach(dundieDelivery -> publisher.toActivityQueue(dundieDelivery.getId()));
+        }
+    }
+
+    @Scheduled(fixedDelay = 60000L)
+    public void restartDeliveriesWithErrorOnActivity() {
+        if (rabbitHealthChecker.isOnline()) {
+            var deliveriesToActivity = dundieDeliveryRepository.findTopByStatusWithMoreThanMinutes(ERROR_ON_ACTIVITY, quantityToSearch, delayedMinutes);
+
+            log.info("Looking for pending Dundie Deliveries with error on Activity. Found: {}", deliveriesToActivity.size());
+
+            deliveriesToActivity.forEach(dundieDelivery -> publisher.toDundieDeliverySplitRollbackQueue(dundieDelivery.getId()));
         }
     }
 

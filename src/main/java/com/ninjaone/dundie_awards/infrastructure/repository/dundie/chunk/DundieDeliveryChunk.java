@@ -53,6 +53,10 @@ public class DundieDeliveryChunk {
         return dundieDelivery;
     }
 
+    public Long getDundieDeliveryId() {
+        return dundieDelivery.getId();
+    }
+
     public Long getStartEmployeeId() {
         return startEmployeeId;
     }
@@ -84,4 +88,5 @@ public class DundieDeliveryChunk {
     public void setFinishedAt(LocalDateTime finishedAt) {
         this.finishedAt = finishedAt;
     }
+
 }

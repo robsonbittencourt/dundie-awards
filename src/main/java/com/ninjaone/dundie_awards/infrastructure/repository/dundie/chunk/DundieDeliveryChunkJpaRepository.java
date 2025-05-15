@@ -2,6 +2,7 @@ package com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,7 +13,7 @@ import java.util.Optional;
 import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 
 @Repository
-public interface DundieDeliveryChunkJpaRepository extends JpaRepository<DundieDeliveryChunk, Long> {
+interface DundieDeliveryChunkJpaRepository extends JpaRepository<DundieDeliveryChunk, Long> {
 
     @Query("""
         SELECT COUNT(c) > 0
@@ -40,4 +41,22 @@ public interface DundieDeliveryChunkJpaRepository extends JpaRepository<DundieDe
         FOR UPDATE
     """, nativeQuery = true)
     List<DundieDeliveryChunk> findTopByStatusWithMoreThanMinutes(@Param("status") String status, @Param("quantity") int quantity, @Param("minutes") int minutes);
+
+    @Modifying
+    @Query(value = """
+        INSERT INTO dundie_delivery_chunk (dundie_delivery_id, start_employee_id, end_employee_id, created_at, status)
+        SELECT dundie_delivery_id, start_employee_id, end_employee_id, NOW(), 'PENDING_ROLLBACK'
+        FROM dundie_delivery_chunk
+        WHERE dundie_delivery_id = :deliveryId
+    """, nativeQuery = true)
+    void createRollbackChunksToDelivery(@Param("deliveryId") Long deliveryId);
+
+    @Query("""
+        SELECT c.id
+        FROM DundieDeliveryChunk c
+        WHERE c.status = :status
+          AND c.dundieDelivery.id = :deliveryId
+    """)
+    List<Long> findIdsByStatusAndDundieDeliveryId(DundieDeliveryChunkStatus status, Long deliveryId);
+
 }
