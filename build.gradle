@@ -26,8 +26,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-	runtimeOnly 'com.h2database:h2'
-	implementation 'org.postgresql:postgresql:42.7.3'
+	implementation 'org.postgresql:postgresql:42.7.5'
+	implementation 'org.flywaydb:flyway-core:11.8.2'
+	runtimeOnly 'org.flywaydb:flyway-database-postgresql:11.8.2'
+
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'net.logstash.logback:logstash-logback-encoder:8.1'

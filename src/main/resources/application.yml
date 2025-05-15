@@ -11,29 +11,33 @@ app:
 spring:
   application:
     name: dundie-awards
+  flyway:
+    enabled: false
   datasource:
-    url: jdbc:h2:mem:mydb
-    username: sa
-    password: password
-    driverClassName: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+    driverClassName: org.postgresql.Driver
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-  thymeleaf:
-    cache: false
-    mode: HTML
-    encoding: UTF-8
-    prefix: file:src/main/resources/static/
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   rabbitmq:
     host: localhost
     port: 5672
     username: admin
     password: admin
-  cache:
-    type: redis
-  redis:
-    host: localhost
-    port: 6379
-    timeout: 2000
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2s
+  thymeleaf:
+    cache: false
+    mode: HTML
+    encoding: UTF-8
+    prefix: file:src/main/resources/static/
   web:
     resources:
       static-locations: file:src/main/resources/static/
