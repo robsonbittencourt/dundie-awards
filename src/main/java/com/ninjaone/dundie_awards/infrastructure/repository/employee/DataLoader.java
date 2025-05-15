@@ -1,7 +1,7 @@
 package com.ninjaone.dundie_awards.infrastructure.repository.employee;
 
 import com.ninjaone.dundie_awards.infrastructure.repository.organization.Organization;
-import com.ninjaone.dundie_awards.infrastructure.repository.organization.OrganizationRepository;
+import com.ninjaone.dundie_awards.infrastructure.repository.organization.OrganizationJpaRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 class DataLoader implements CommandLineRunner {
 
     private final EmployeeJpaRepository employeeRepository;
-    private final OrganizationRepository organizationRepository;
+    private final OrganizationJpaRepository organizationRepository;
 
-    public DataLoader(EmployeeJpaRepository employeeRepository, OrganizationRepository organizationRepository) {
+    public DataLoader(EmployeeJpaRepository employeeRepository, OrganizationJpaRepository organizationRepository) {
         this.employeeRepository = employeeRepository;
         this.organizationRepository = organizationRepository;
     }

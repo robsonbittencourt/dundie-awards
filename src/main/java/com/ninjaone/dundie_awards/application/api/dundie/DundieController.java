@@ -25,8 +25,9 @@ class DundieController {
 
     @PostMapping("/give-dundie-awards/{organizationId}")
     ResponseEntity<GiveDundieAwardsResponse> giveDundieAwards(@PathVariable Long organizationId) {
-        UUID dundieDeliveryId = dundieDeliveryManager.giveDundieAwards(organizationId);
-        return ok(new GiveDundieAwardsResponse(dundieDeliveryId));
+        return dundieDeliveryManager.giveDundieAwards(organizationId)
+            .map(deliveryIdentifier -> ok(new GiveDundieAwardsResponse(deliveryIdentifier)))
+            .orElse(notFound().build());
     }
 
     @GetMapping("/dundie-delivery/{identifier}")

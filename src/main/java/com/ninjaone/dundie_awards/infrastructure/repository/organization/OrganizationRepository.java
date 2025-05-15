@@ -1,9 +1,16 @@
 package com.ninjaone.dundie_awards.infrastructure.repository.organization;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OrganizationRepository extends JpaRepository<Organization, Long> {
+public class OrganizationRepository {
+
+    @Autowired
+    private OrganizationJpaRepository jpaRepository;
+
+    public boolean existsById(Long id) {
+        return jpaRepository.existsById(id);
+    }
 
 }
