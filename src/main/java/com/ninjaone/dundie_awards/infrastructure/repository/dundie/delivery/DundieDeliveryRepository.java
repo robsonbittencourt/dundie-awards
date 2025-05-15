@@ -36,30 +36,18 @@ public class DundieDeliveryRepository {
 
     @Transactional
     public void toRunning(DundieDelivery dundieDelivery) {
-        dundieDelivery.setStatus(RUNNING);
-        dundieDelivery.setUpdatedAt(now());
-        jpaRepository.save(dundieDelivery);
-
-        createDundieDeliveryStatus(dundieDelivery, RUNNING);
+        updateStatus(dundieDelivery, RUNNING);
     }
 
     @Transactional
     public void toDelivered(DundieDelivery dundieDelivery) {
-        dundieDelivery.setStatus(DELIVERED);
-        dundieDelivery.setUpdatedAt(now());
-        jpaRepository.save(dundieDelivery);
-
-        createDundieDeliveryStatus(dundieDelivery, DELIVERED);
+        updateStatus(dundieDelivery, DELIVERED);
     }
 
     @Transactional
     public void toFinished(DundieDelivery dundieDelivery) {
-        dundieDelivery.setStatus(FINISHED);
-        dundieDelivery.setUpdatedAt(now());
         dundieDelivery.setFinishedAt(now());
-        jpaRepository.save(dundieDelivery);
-
-        createDundieDeliveryStatus(dundieDelivery, FINISHED);
+        updateStatus(dundieDelivery, FINISHED);
     }
 
     @Transactional(propagation = REQUIRES_NEW)
@@ -67,28 +55,28 @@ public class DundieDeliveryRepository {
         var searchResult = jpaRepository.findById(dundieDeliveryId);
 
         searchResult.ifPresent(dundieDelivery -> {
-            dundieDelivery.setStatus(ERROR_ON_ACTIVITY);
-            dundieDelivery.setUpdatedAt(now());
-            jpaRepository.save(dundieDelivery);
-
-            createDundieDeliveryStatus(dundieDelivery, ERROR_ON_ACTIVITY);
+            updateStatus(dundieDelivery, ERROR_ON_ACTIVITY);
         });
     }
 
     @Transactional
     public void toUndone(DundieDelivery dundieDelivery) {
-        dundieDelivery.setStatus(UNDONE);
-        dundieDelivery.setUpdatedAt(now());
         dundieDelivery.setFinishedAt(now());
-        jpaRepository.save(dundieDelivery);
-
-        createDundieDeliveryStatus(dundieDelivery, UNDONE);
+        updateStatus(dundieDelivery, UNDONE);
     }
 
     @Transactional
     public List<DundieDelivery> findTopByStatusWithDelay(int quantity, int minutes, DundieDeliveryStatusEnum ...status) {
         List<String> statusList = stream(status).map(Enum::name).toList();
         return jpaRepository.findTopByStatusWithMoreThanMinutes(quantity, minutes, statusList);
+    }
+
+    private void updateStatus(DundieDelivery dundieDelivery, DundieDeliveryStatusEnum deliveryStatus) {
+        dundieDelivery.setStatus(deliveryStatus);
+        dundieDelivery.setUpdatedAt(now());
+        jpaRepository.save(dundieDelivery);
+
+        createDundieDeliveryStatus(dundieDelivery, deliveryStatus);
     }
 
     private void createDundieDeliveryStatus(DundieDelivery dundieDelivery, DundieDeliveryStatusEnum deliveryStatus) {

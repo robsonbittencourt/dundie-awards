@@ -54,5 +54,3 @@ With breaking contract:
 
 
 Validate if organization exists
-Verify duplication in DundieDeliveryRepository
-Refactory sentinel
