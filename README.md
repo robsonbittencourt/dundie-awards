@@ -1,19 +1,41 @@
-## Employee directory organization
+# Dundie Awards
 
-This is an application for managing employees of a company. Employees belong to organizations within the company.
+The project has been adjusted according to the key points discussed in our last meeting.
 
-As recognition, employees can receive Dundie Awards.
+## Disclaimer
+All changes were made with high-scale scenarios in mind. The trophies delivered by Michael Scott have become famous, and companies with millions of employees are now handing them out :).
 
-* A `Dundie Award` is in reference to the TV show [The Office](https://en.wikipedia.org/wiki/The_Dundies) in which the main character hands out awards to his colleagues. For our purposes, it's a generic award.
+## Transactions
+The SAGA pattern was adopted to manage the flow of Dundie deliveries. Although we only have one service for the purpose of this test, this pattern is important to maintain tracking of the deliveries and to ensure atomicity in a flow that may involve a large set of data and steps.
 
-## Instructions
+The SAGA is controlled by the Dundie Delivery status tables. These statuses allow us to see which processing steps have been executed and identify any issues.
 
-In preparation for the upcoming call with NinjaOne, `clone` this repo and run it locally. If everything runs successfully, you will see the following page in your browser.
+One point that was heavily discussed in our conversation was what would happen with transactions that were not committed after messages were published to the queues. This issue was solved using TransactionalEventListener, which only sends messages to the queue after the transaction is committed. This way, we only publish a message when we are sure the data has been persisted in the database.
 
-![success](success.png)
+## Compensation
+This transaction strategy leaves us with a potential gap where, if the message broker is unavailable, the processing would be left in limbo. That’s where the DundieDeliverySentinel comes in. Using a scheduler, this component runs a cron job every minute to check for intermediate statuses and send the items to the appropriate queues.
 
-Become familiar with the application and it's characteristics. Use your favorite HTTP Client (like [Postman](https://www.postman.com/)) to exercise the endpoints and step through the code to help you get to know the application. 
+## Resilience
+The application is designed to run without the message broker or the cache. Any unavailability of these components does not compromise the application’s core functionality. In the case of the broker, Dundie delivery is delayed, but users can still make new requests. Once the broker is back online, everything is reprocessed automatically.
 
-In the call, we will introduce new code to the application, and you will comment on issues with the endpoint. Please be ready to share your screen in the call with us with the application ready to run. 
+## Software Architecture
+A clear separation between Application and Infrastructure layers was implemented, based on Hexagonal Architecture. We don’t yet have a Domain layer, and therefore no dependency inversion. This layer can be added as the complexity of the Dundie delivery rules increases.
 
-**Bonus:** Spot any issues or potential improvements you notice in the application while you're familiarizing yourself and make note of them for our call. We would love to see your input in how to make this application better.
+## Running the Application
+The application is configured in its default profile to run with local infrastructure (Database, Message Broker, and Cache). So before starting, run:
+
+```
+docker-compose up -d
+```
+
+After that, for the first run only, the database scripts need to be executed. To do this, run the application with the ```db-migration``` profile, or simply enable Flyway temporarily in the default profile:
+
+```
+spring:
+  application:
+    name: dundie-awards
+  flyway:
+    enabled: true
+```
+
+After that, run the application normally. In the ```postman``` folder, you’ll find a collection for the Dundie Awards API.
