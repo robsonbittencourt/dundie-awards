@@ -1,7 +1,7 @@
 package com.ninjaone.dundie_awards.application.dundie.sentinel;
 
 import com.ninjaone.dundie_awards.application.dundie.publisher.DundieDeliverPublisher;
-import com.ninjaone.dundie_awards.infrastructure.config.RabbitHealthChecker;
+import com.ninjaone.dundie_awards.infrastructure.helper.RabbitHealthChecker;
 import com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkRepository;
 import com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryRepository;
 import org.slf4j.Logger;

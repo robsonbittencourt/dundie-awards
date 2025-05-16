@@ -15,6 +15,38 @@ bootJar {
 	archiveFileName = 'dundie-awards.jar'
 }
 
+sourceSets {
+	integrationTest {
+		java {
+			srcDir file('src/integration-test/java')
+		}
+		compileClasspath += sourceSets.main.output + sourceSets.test.output
+		runtimeClasspath += output + compileClasspath
+	}
+}
+
+configurations {
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+tasks.register('integrationTest', Test) {
+	description = 'Runs integration tests.'
+	group = 'verification'
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	include '**/*IT.class'
+	shouldRunAfter test
+}
+
+tasks.named('compileIntegrationTestJava') {
+	dependsOn tasks.named('compileJava')
+}
+
+tasks.named('check') {
+	dependsOn tasks.named('integrationTest')
+}
+
 repositories {
 	mavenCentral()
 }
@@ -44,5 +76,9 @@ dependencies {
 }
 
 tasks.named('test') {
+	useJUnitPlatform()
+}
+
+tasks.named('integrationTest') {
 	useJUnitPlatform()
 }

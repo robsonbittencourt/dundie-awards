@@ -1,4 +1,4 @@
-package com.ninjaone.dundie_awards.infrastructure.config;
+package com.ninjaone.dundie_awards.infrastructure.helper;
 
 import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
