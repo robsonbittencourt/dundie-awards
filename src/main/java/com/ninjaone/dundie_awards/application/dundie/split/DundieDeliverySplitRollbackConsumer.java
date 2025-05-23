@@ -13,7 +13,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import java.util.List;
 
 import static com.ninjaone.dundie_awards.infrastructure.config.RabbitConfig.DUNDIE_DELIVERY_SPLIT_ROLLBACK_QUEUE;
-import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkStatus.PENDING;
+import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkStatus.PENDING_ROLLBACK;
 import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.ERROR_ON_ACTIVITY;
 import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
 
@@ -41,7 +41,7 @@ public class DundieDeliverySplitRollbackConsumer {
             dundieDeliveryRepository.toRunning(dundieDelivery);
 
             chunkRepository.createRollbackChunksToDelivery(dundieDeliveryId);
-            List<Long> chunksIds = chunkRepository.findIdsByDundieDeliveryIdAndStatus(dundieDeliveryId, PENDING);
+            List<Long> chunksIds = chunkRepository.findIdsByDundieDeliveryIdAndStatus(dundieDeliveryId, PENDING_ROLLBACK);
 
             eventPublisher.publishEvent(new DundieDeliverySplitRollbackFinished(this, chunksIds));
         });

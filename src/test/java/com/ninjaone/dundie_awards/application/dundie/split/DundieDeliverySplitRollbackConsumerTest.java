@@ -13,10 +13,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import java.util.List;
 import java.util.Optional;
 
-import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkStatus.PENDING;
+import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.chunk.DundieDeliveryChunkStatus.PENDING_ROLLBACK;
 import static com.ninjaone.dundie_awards.infrastructure.repository.dundie.delivery.DundieDeliveryStatusEnum.ERROR_ON_ACTIVITY;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 class DundieDeliverySplitRollbackConsumerTest {
@@ -51,7 +52,7 @@ class DundieDeliverySplitRollbackConsumerTest {
         when(dundieDeliveryRepository.findByIdAndStatusWithLock(deliveryId, ERROR_ON_ACTIVITY)).thenReturn(Optional.of(dundieDelivery));
 
         List<Long> chunkIds = List.of(101L, 102L);
-        when(chunkRepository.findIdsByDundieDeliveryIdAndStatus(deliveryId, PENDING)).thenReturn(chunkIds);
+        when(chunkRepository.findIdsByDundieDeliveryIdAndStatus(deliveryId, PENDING_ROLLBACK)).thenReturn(chunkIds);
 
         consumer.rollback(deliveryId);
 
